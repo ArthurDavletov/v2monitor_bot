@@ -55,7 +55,7 @@ LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 root_logger = logging.getLogger()
 root_logger.handlers = []
-root_logger.setLevel(logging.DEBUG)
+root_logger.setLevel(logging.INFO)
 
 file_handler = CompressedRotatingFileHandler(
     LOG_FILE, maxBytes=10*1024*1024,

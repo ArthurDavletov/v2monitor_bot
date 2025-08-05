@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from bot.modules.logger import get_logger
 from bot.modules.v2ray import is_service_active, get_stats
+from bot.keyboards.menu_keyboard import create_main_menu, settings_menu
 
 logger = get_logger(__name__)
 
@@ -35,13 +36,13 @@ async def command_start_handler(message: Message, is_admin: bool, is_client: boo
         content += Text("You're the client! Congratulations!")
     if is_admin and is_client:
         content += Text("You're an admin and can use client's commands!")
-    await message.answer(**content.as_kwargs())
+    await message.answer(**content.as_kwargs(), reply_markup=create_main_menu(is_admin, True, True, True))
 
 
-@router.message(Command("status"))
+@router.message(F.text.lower() == "status 🛠")
 async def command_status_handler(message: Message, is_admin: bool, is_client: bool) -> None:
-    """This handler receives messages with `/status` command"""
-    logger.info(f"Received /status command from {message.from_user.full_name}"
+    """This handler receives messages with `Status 🛠` command"""
+    logger.info(f"Received `Status 🛠` command from {message.from_user.full_name}"
                 f"(ID: {message.from_user.id}, admin = {is_admin}, user = {is_client})")
     if not is_admin:
         text = "You're not an admin, you can't use this command."
@@ -56,10 +57,10 @@ async def command_status_handler(message: Message, is_admin: bool, is_client: bo
     await message.answer(text)
 
 
-@router.message(Command("stats"))
+@router.message(F.text.lower() == "all stats 📊")
 async def command_stats_handler(message: Message, is_admin: bool, is_client: bool) -> None:
-    """This handler receives messages with `/stats` command"""
-    logger.info(f"Received /stats command from {message.from_user.full_name}"
+    """This handler receives messages with `All Stats 📊` command"""
+    logger.info(f"Received `All Stats 📊` command from {message.from_user.full_name}"
                 f"(ID: {message.from_user.id}, admin = {is_admin}, user = {is_client})")
     if not is_admin:
         text = "You're not an admin, you can't use this command."

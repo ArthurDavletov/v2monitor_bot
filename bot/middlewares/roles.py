@@ -8,6 +8,21 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from bot.modules.models import Client
 
 
+class DBSessionMiddleware(BaseMiddleware):
+    def __init__(self, session: async_sessionmaker[AsyncSession]):
+        self.__session = session
+
+    async def __call__(
+            self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: TelegramObject,
+            data: Dict[str, Any],
+    ) -> Any:
+        async with self.__session() as session:
+            data["session"] = session
+            return await handler(event, data)
+
+
 class RolesMiddleware(BaseMiddleware):
     def __init__(self, admin_id: int, session: async_sessionmaker[AsyncSession]):
         self.__admin_id = admin_id

@@ -17,8 +17,8 @@ from bot.modules.models import Base
 from bot.modules.logger import get_logger
 from bot.modules.v2ray import is_service_active, get_stats
 from bot.filters.user_roles import IsAdmin, IsClient
-from middlewares.roles import RolesMiddleware
-import handlers.commands as commands
+from bot.middlewares.roles import RolesMiddleware
+import bot.handlers.commands as commands
 
 
 logger = get_logger(__name__)
