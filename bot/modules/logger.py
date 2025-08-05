@@ -50,7 +50,7 @@ class CompressedRotatingFileHandler(RotatingFileHandler):
             archive.unlink()
 
 
-LOG_FILE = Path(os.path.dirname(__file__)) / "logs" / "bot.log"
+LOG_FILE = Path(os.path.dirname(__file__)) / ".."/ "logs" / "bot.log"
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 root_logger = logging.getLogger()

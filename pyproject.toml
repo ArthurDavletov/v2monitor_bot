@@ -1,0 +1,19 @@
+[project]
+name = "v2monitor_bot"
+version = "1.0.0"
+description = "Telegram bot for monitoring v2ray"
+readme="README.md"
+license="MIT"
+authors = [
+    {name = "Arthur Davletov", email = "ar.davletov2013@gmail.com"}
+]
+dependencies = [
+    "aiogram>=3.0.0",
+    "python-dotenv",
+    "prettytable",
+    "sqlalchemy[asyncio]",
+    "aiosqlite"
+]
+
+[tool.setuptools]
+packages = ["bot"]
