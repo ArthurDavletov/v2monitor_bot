@@ -7,17 +7,12 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart, Command, Filter
-from aiogram.types import Message
-from aiogram.utils.formatting import Text, Bold, Pre
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import sessionmaker
 
 from bot.modules.models import Base
 from bot.modules.logger import get_logger
-from bot.modules.v2ray import is_service_active, get_stats
-from bot.filters.user_roles import IsAdmin, IsClient
-from bot.middlewares.roles import RolesMiddleware, DBSessionMiddleware
+from bot.middlewares.roles import RolesMiddleware
+from bot.middlewares.db_middleware import DBSessionMiddleware
 import bot.handlers.commands as commands
 
 

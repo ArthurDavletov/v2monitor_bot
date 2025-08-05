@@ -1,7 +1,7 @@
 import os
 
-from aiogram import Router, types, F
-from aiogram.filters import CommandStart, Command
+from aiogram import Router, F
+from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.formatting import Text, Bold, Pre
 from dotenv import load_dotenv
