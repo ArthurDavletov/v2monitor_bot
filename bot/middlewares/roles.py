@@ -18,15 +18,13 @@ class DBSessionMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any],
     ) -> Any:
-        async with self.__session() as session:
-            data["session"] = session
-            return await handler(event, data)
+        data["async_sessionmaker"] = self.__session
+        return await handler(event, data)
 
 
 class RolesMiddleware(BaseMiddleware):
-    def __init__(self, admin_id: int, session: async_sessionmaker[AsyncSession]):
+    def __init__(self, admin_id: int):
         self.__admin_id = admin_id
-        self.__session = session
 
     async def __call__(
             self,
@@ -38,7 +36,7 @@ class RolesMiddleware(BaseMiddleware):
         data["is_admin"] = data["is_client"] = False
         if user is not None:
             data["is_admin"] = (user.id == self.__admin_id)
-            async with self.__session() as session:
+            async with data["async_sessionmaker"]() as session:
                 result = await session.execute(select(Client).where(Client.id == user.id))
                 data["is_client"] = result.scalar() is not None
         return await handler(event, data)

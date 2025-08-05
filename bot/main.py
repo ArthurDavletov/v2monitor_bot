@@ -17,7 +17,7 @@ from bot.modules.models import Base
 from bot.modules.logger import get_logger
 from bot.modules.v2ray import is_service_active, get_stats
 from bot.filters.user_roles import IsAdmin, IsClient
-from bot.middlewares.roles import RolesMiddleware
+from bot.middlewares.roles import RolesMiddleware, DBSessionMiddleware
 import bot.handlers.commands as commands
 
 
@@ -62,7 +62,8 @@ async def main() -> None:
 
     dp = Dispatcher()
     dp.include_router(commands.router)
-    commands.router.message.middleware(RolesMiddleware(admin_id, async_session))
+    commands.router.message.middleware(DBSessionMiddleware(async_session))
+    commands.router.message.middleware(RolesMiddleware(admin_id))
     await dp.start_polling(bot)
     await engine.dispose()
 

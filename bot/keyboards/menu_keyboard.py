@@ -7,7 +7,7 @@ def create_main_menu(is_admin: bool = False, history_access: bool = False,
     """Create the main menu keyboard."""
     builder = ReplyKeyboardBuilder()
     if is_admin:
-        builder.row(KeyboardButton(text = "Status 🛠"), KeyboardButton(text = "All stats 📊"))
+        builder.row(KeyboardButton(text = "Status 🛠"), KeyboardButton(text = "All Stats 📊"))
     row_buttons = []
     if history_access:
         row_buttons.append(KeyboardButton(text = "History 📜"))
@@ -19,9 +19,15 @@ def create_main_menu(is_admin: bool = False, history_access: bool = False,
     builder.row(KeyboardButton(text = "Settings ⚙️"), KeyboardButton(text = "Help ❓"))
     return builder.as_markup(resize_keyboard=True, one_time_keyboard=False)
 
-def settings_menu() -> ReplyKeyboardMarkup:
+
+def settings_menu(is_admin: bool = False) -> ReplyKeyboardMarkup:
     """Create the settings menu keyboard."""
     builder = ReplyKeyboardBuilder()
-    builder.row(KeyboardButton(text = "Change Language"), KeyboardButton(text = "Back to Main Menu"))
+    builder.row(
+        KeyboardButton(text = "Change Language 🌐"),
+        KeyboardButton(text = "Change Policy 📜"),
+    )
+    if is_admin:
+        builder.row(KeyboardButton(text = "Manage Clients 👥"))
+    builder.row(KeyboardButton(text = "Back to Main Menu ↩️"))
     return builder.as_markup(resize_keyboard=True, one_time_keyboard=False)
-

@@ -39,7 +39,7 @@ async def command_start_handler(message: Message, is_admin: bool, is_client: boo
     await message.answer(**content.as_kwargs(), reply_markup=create_main_menu(is_admin, True, True, True))
 
 
-@router.message(F.text.lower() == "status 🛠")
+@router.message(F.text == "Status 🛠")
 async def command_status_handler(message: Message, is_admin: bool, is_client: bool) -> None:
     """This handler receives messages with `Status 🛠` command"""
     logger.info(f"Received `Status 🛠` command from {message.from_user.full_name}"
@@ -57,7 +57,7 @@ async def command_status_handler(message: Message, is_admin: bool, is_client: bo
     await message.answer(text)
 
 
-@router.message(F.text.lower() == "all stats 📊")
+@router.message(F.text == "All Stats 📊")
 async def command_stats_handler(message: Message, is_admin: bool, is_client: bool) -> None:
     """This handler receives messages with `All Stats 📊` command"""
     logger.info(f"Received `All Stats 📊` command from {message.from_user.full_name}"
@@ -69,3 +69,19 @@ async def command_stats_handler(message: Message, is_admin: bool, is_client: boo
     text = get_stats(API_SERVER)
     content = Text(Pre(text))
     await message.answer(**content.as_kwargs())
+
+
+@router.message(F.text == "Settings ⚙️")
+async def command_settings_handler(message: Message, is_admin: bool, is_client: bool) -> None:
+    """This handler receives messages with `Settings ⚙️` command"""
+    logger.info(f"Received `Settings ⚙️` command from {message.from_user.full_name} "
+                f"(ID: {message.from_user.id}, admin = {is_admin}, user = {is_client})")
+    await message.answer("Settings menu:", reply_markup=settings_menu(is_admin))
+
+
+@router.message(F.text == "Back to Main Menu ↩️")
+async def command_back_to_main_menu_handler(message: Message, is_admin: bool, is_client: bool) -> None:
+    """This handler receives messages with `Back to Main Menu ↩️` command"""
+    logger.info(f"Received `Back to Main Menu ↩️` command from {message.from_user.full_name} "
+                f"(ID: {message.from_user.id}, admin = {is_admin}, user = {is_client})")
+    await message.answer("Main menu:", reply_markup=create_main_menu(is_admin, True, True, True))
