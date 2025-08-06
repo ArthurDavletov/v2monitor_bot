@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,9 +20,10 @@ class Client(Base):
     traffic_access: Mapped[bool] = mapped_column(default=False)
     stats_access: Mapped[bool] = mapped_column(default=False)
 
-    history = relationship("ClientHistory", backref= "client")
-    traffic = relationship("ClientTraffic", backref= "client")
-    requests = relationship("ClientRequests", backref="client")
+    history: Mapped[List["ClientHistory"]] = relationship(back_populates = "client")
+    traffic: Mapped[List["ClientTraffic"]] = relationship(back_populates = "client")
+    requests: Mapped[List["ClientRequests"]] = relationship(back_populates = "client")
+    client_temp_selection: Mapped[List["ClientsTempSelection"]] = relationship(back_populates = "client")
 
     def __repr__(self):
         return f"Client(id={self.id}, email='{self.email}', history_access={self.history_access}, " \
@@ -30,11 +33,13 @@ class Client(Base):
 class ClientHistory(Base):
     __tablename__ = "client_history"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement = True)
     user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
     site_url: Mapped[str]
     last_visit_time: Mapped[datetime]
     count: Mapped[int] = mapped_column(default=1)
+
+    client: Mapped[Client] = relationship(back_populates = "history")
 
     def __repr__(self):
         return f"ClientHistory(id={self.id}, user_id={self.user_id}, site_url='{self.site_url}', " \
@@ -44,12 +49,14 @@ class ClientHistory(Base):
 class ClientTraffic(Base):
     __tablename__ = "client_traffic"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
     bytes_sent: Mapped[int] = mapped_column(default=0)
     bytes_received: Mapped[int] = mapped_column(default=0)
+
+    client: Mapped[Client] = relationship(back_populates = "traffic")
 
     def __repr__(self):
         return f"ClientTraffic(id={self.id}, user_id={self.user_id}, start_time={self.start_time}, " \
@@ -59,11 +66,13 @@ class ClientTraffic(Base):
 class ClientRequests(Base):
     __tablename__ = "client_requests"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
     requests_count: Mapped[int] = mapped_column(default=0)
+
+    client: Mapped[Client] = relationship(back_populates = "requests")
 
     def __repr__(self):
         return f"ClientRequests(id={self.id}, user_id={self.user_id}, start_time={self.start_time}, " \

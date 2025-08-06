@@ -4,9 +4,10 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
 
-class IsAdminMiddleware(BaseMiddleware):
-    def __init__(self, admin_id: int):
+class AdminMiddleware(BaseMiddleware):
+    def __init__(self, admin_id: int, allow_clients: bool = False) -> None:
         self.__admin_id = admin_id
+        self.__allow_clients = allow_clients
 
     async def __call__(
             self,
@@ -15,7 +16,12 @@ class IsAdminMiddleware(BaseMiddleware):
             data: Dict[str, Any],
     ) -> Any:
         user = data["event_from_user"]
-        data["is_admin"] = False
-        if user is not None:
-            data["is_admin"] = (user.id == self.__admin_id)
-        return await handler(event, data)
+        is_admin = (user.id == self.__admin_id)
+        if self.__allow_clients:
+            data["is_admin"] = is_admin
+            return await handler(event, data)
+        if is_admin:
+            return await handler(event, data)
+        await event.message.answer("You're not an admin. You can't use the admin's commands!")
+        return None
+

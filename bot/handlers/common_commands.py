@@ -1,29 +1,22 @@
-import os
-
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from aiogram.utils.formatting import Text, Bold, Pre
-from dotenv import load_dotenv
+from aiogram.utils.formatting import Text, Bold
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from bot.modules.logger import get_logger
 from bot.modules.models import Client
-from bot.modules.v2ray import is_service_active, get_stats
 from bot.keyboards.menu_keyboard import create_main_menu, settings_menu
 
 logger = get_logger(__name__)
 
 router = Router()
 
-load_dotenv()
-API_SERVER = os.getenv("API_SERVER")
-
 
 async def get_policies(user_id: int, sessionmaker: async_sessionmaker[AsyncSession]) -> tuple[bool, bool, bool]:
     async with sessionmaker() as session:
-        client: Client | None = (await session.scalars(select(Client).where(Client.id == user_id))).first()
+        client = (await session.scalars(select(Client).where(Client.id == user_id))).first()
         if client is None:
             return False, False, False
         return client.history_access, client.traffic_access, client.stats_access
@@ -59,38 +52,6 @@ async def command_start_handler(message: Message, is_admin: bool,
     )
 
 
-@router.message(F.text == "Status 🛠")
-async def command_status_handler(message: Message, is_admin: bool) -> None:
-    """This handler receives messages with `Status 🛠` command"""
-    logger.info(f"Received `Status 🛠` command from {message.from_user.full_name}"
-                f"(ID: {message.from_user.id}, admin = {is_admin})")
-    if not is_admin:
-        text = "You're not an admin, you can't use this command."
-        await message.answer(text)
-        return
-    text = ""
-    for service in ("v2ray", "nginx"):
-        if is_service_active(service):
-            text += f"The {service} service is currently active. ✅\n"
-        else:
-            text += f"The {service} service isn't active. ❌\n"
-    await message.answer(text)
-
-
-@router.message(F.text == "All Stats 📊")
-async def command_stats_handler(message: Message, is_admin: bool) -> None:
-    """This handler receives messages with `All Stats 📊` command"""
-    logger.info(f"Received `All Stats 📊` command from {message.from_user.full_name}"
-                f"(ID: {message.from_user.id}, admin = {is_admin})")
-    if not is_admin:
-        text = "You're not an admin, you can't use this command."
-        await message.answer(text)
-        return
-    text = get_stats(API_SERVER)
-    content = Text(Pre(text))
-    await message.answer(**content.as_kwargs())
-
-
 @router.message(F.text == "Settings ⚙️")
 async def command_settings_handler(message: Message, is_admin: bool) -> None:
     """This handler receives messages with `Settings ⚙️` command"""
@@ -110,16 +71,3 @@ async def command_back_to_main_menu_handler(message: Message, is_admin: bool,
         "Main menu:",
         reply_markup=create_main_menu(is_admin, *policies)
     )
-
-
-@router.message(F.text == "Manage Clients 👥")
-async def command_manage_clients_handler(message: Message, is_admin: bool,
-                                         sessionmaker: async_sessionmaker[AsyncSession]) -> None:
-    """This handler receives messages with `Manage Clients 👥` command"""
-    logger.info(f"Received `Manage Clients 👥` command from {message.from_user.full_name} "
-                f"(ID: {message.from_user.id}, admin = {is_admin})")
-    if not is_admin:
-        await message.answer("You're not an admin, you can't use this command.")
-        return
-    async with sessionmaker() as session:
-        users = await session.scalars(select(Client))

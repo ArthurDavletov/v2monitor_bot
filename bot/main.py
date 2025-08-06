@@ -2,6 +2,7 @@
 import asyncio
 import os
 
+from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
@@ -12,9 +13,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from bot.middlewares.only_clients_middleware import OnlyClientsMiddleware
 from bot.modules.models import Base
 from bot.modules.logger import get_logger
-from bot.middlewares.is_admin_middleware import IsAdminMiddleware
+from bot.middlewares.is_admin_middleware import AdminMiddleware
 from bot.middlewares.db_middleware import DBSessionMiddleware
-import bot.handlers.commands as commands
+import bot.handlers.common_commands as common_commands
+import bot.handlers.admin_commands as admin_commands
 
 
 logger = get_logger(__name__)
@@ -56,11 +58,13 @@ async def main() -> None:
         await conn.run_sync(Base.metadata.create_all)
     async_session = async_sessionmaker(engine, expire_on_commit=False)
 
-    dp = Dispatcher()
-    dp.include_router(commands.router)
+    dp = Dispatcher(storage = MemoryStorage())
     dp.update.outer_middleware(DBSessionMiddleware(async_session))
     dp.update.outer_middleware(OnlyClientsMiddleware(admin_id))
-    commands.router.message.middleware(IsAdminMiddleware(admin_id))
+    dp.include_router(common_commands.router)
+    dp.include_router(admin_commands.router)
+    common_commands.router.message.outer_middleware(AdminMiddleware(admin_id, True))
+    admin_commands.router.message.outer_middleware(AdminMiddleware(admin_id, False))
     await dp.start_polling(bot)
     await engine.dispose()
 
