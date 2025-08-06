@@ -30,4 +30,4 @@ def settings_menu(is_admin: bool = False) -> ReplyKeyboardMarkup:
     if is_admin:
         builder.row(KeyboardButton(text = "Manage Clients 👥"))
     builder.row(KeyboardButton(text = "Back to Main Menu ↩️"))
-    return builder.as_markup(resize_keyboard=True, one_time_keyboard=False)
+    return builder.as_markup(resize_keyboard=True)

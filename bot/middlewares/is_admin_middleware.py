@@ -2,12 +2,9 @@ from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from sqlalchemy import select
-
-from bot.modules.models import Client
 
 
-class RolesMiddleware(BaseMiddleware):
+class IsAdminMiddleware(BaseMiddleware):
     def __init__(self, admin_id: int):
         self.__admin_id = admin_id
 
@@ -18,10 +15,7 @@ class RolesMiddleware(BaseMiddleware):
             data: Dict[str, Any],
     ) -> Any:
         user = data["event_from_user"]
-        data["is_admin"] = data["is_client"] = False
+        data["is_admin"] = False
         if user is not None:
             data["is_admin"] = (user.id == self.__admin_id)
-            async with data["async_sessionmaker"]() as session:
-                result = await session.execute(select(Client).where(Client.id == user.id))
-                data["is_client"] = result.scalar() is not None
         return await handler(event, data)

@@ -9,9 +9,10 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
+from bot.middlewares.only_clients_middleware import OnlyClientsMiddleware
 from bot.modules.models import Base
 from bot.modules.logger import get_logger
-from bot.middlewares.roles import RolesMiddleware
+from bot.middlewares.is_admin_middleware import IsAdminMiddleware
 from bot.middlewares.db_middleware import DBSessionMiddleware
 import bot.handlers.commands as commands
 
@@ -57,8 +58,9 @@ async def main() -> None:
 
     dp = Dispatcher()
     dp.include_router(commands.router)
-    commands.router.message.middleware(DBSessionMiddleware(async_session))
-    commands.router.message.middleware(RolesMiddleware(admin_id))
+    dp.update.outer_middleware(DBSessionMiddleware(async_session))
+    dp.update.outer_middleware(OnlyClientsMiddleware(admin_id))
+    commands.router.message.middleware(IsAdminMiddleware(admin_id))
     await dp.start_polling(bot)
     await engine.dispose()
 
