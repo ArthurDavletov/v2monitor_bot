@@ -20,30 +20,14 @@ class Client(Base):
     traffic_access: Mapped[bool] = mapped_column(default=False)
     stats_access: Mapped[bool] = mapped_column(default=False)
 
-    history: Mapped[List["ClientHistory"]] = relationship(back_populates = "client")
     traffic: Mapped[List["ClientTraffic"]] = relationship(back_populates = "client")
+    history: Mapped[List["ClientHistory"]] = relationship(back_populates = "client")
     requests: Mapped[List["ClientRequests"]] = relationship(back_populates = "client")
     client_temp_selection: Mapped[List["ClientsTempSelection"]] = relationship(back_populates = "client")
 
     def __repr__(self):
         return f"Client(id={self.id}, email='{self.email}', history_access={self.history_access}, " \
                f"traffic_access={self.traffic_access}, stats_access={self.stats_access})"
-
-
-class ClientHistory(Base):
-    __tablename__ = "client_history"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement = True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
-    site_url: Mapped[str]
-    last_visit_time: Mapped[datetime]
-    count: Mapped[int] = mapped_column(default=1)
-
-    client: Mapped[Client] = relationship(back_populates = "history")
-
-    def __repr__(self):
-        return f"ClientHistory(id={self.id}, user_id={self.user_id}, site_url='{self.site_url}', " \
-               f"last_visit_time={self.last_visit_time}, count={self.count})"
 
 
 class ClientTraffic(Base):
@@ -61,6 +45,22 @@ class ClientTraffic(Base):
     def __repr__(self):
         return f"ClientTraffic(id={self.id}, user_id={self.user_id}, start_time={self.start_time}, " \
                f"end_time={self.end_time}, bytes_sent={self.bytes_sent}, bytes_received={self.bytes_received})"
+
+
+class ClientHistory(Base):
+    __tablename__ = "client_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement = True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
+    site_url: Mapped[str]
+    last_visit_time: Mapped[datetime]
+    count: Mapped[int] = mapped_column(default=1)
+
+    client: Mapped[Client] = relationship(back_populates = "history")
+
+    def __repr__(self):
+        return f"ClientHistory(id={self.id}, user_id={self.user_id}, site_url='{self.site_url}', " \
+               f"last_visit_time={self.last_visit_time}, count={self.count})"
 
 
 class ClientRequests(Base):
