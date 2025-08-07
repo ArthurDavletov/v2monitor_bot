@@ -77,3 +77,14 @@ class ClientRequests(Base):
     def __repr__(self):
         return f"ClientRequests(id={self.id}, user_id={self.user_id}, start_time={self.start_time}, " \
                f"end_time={self.end_time}, requests_count={self.requests_count})"
+
+
+class ClientsTempSelection(Base):
+    __tablename__ = "clients_temp_selection"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement = True)
+    admin_id: Mapped[int]
+    client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"))
+    number: Mapped[int]
+
+    client: Mapped[Client] = relationship(back_populates = "client_temp_selection")
