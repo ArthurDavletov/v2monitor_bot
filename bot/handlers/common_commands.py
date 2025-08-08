@@ -15,13 +15,6 @@ logger = get_logger(__name__)
 router = Router()
 
 
-async def get_policies(user_id: int, session: AsyncSession) -> tuple[bool, bool, bool]:
-    client = (await session.scalars(select(Client).where(Client.id == user_id))).first()
-    if client is None:
-        return False, False, False
-    return client.history_access, client.traffic_access, client.stats_access
-
-
 @router.message(CommandStart())
 async def command_start_handler(message: Message, is_admin: bool,
                                 session: AsyncSession) -> None:

@@ -64,6 +64,8 @@ async def main() -> None:
     dp.include_router(common_commands.router)
     dp.include_router(admin_commands.router)
     dp.include_router(clients_manager.router)
+    dp.include_router(policies_commands.router)
+    dp.include_router(clients_commands.router)
     common_commands.router.message.outer_middleware(AdminMiddleware(admin_id, True))
     admin_commands.router.message.outer_middleware(AdminMiddleware(admin_id, False))
     clients_manager.router.message.outer_middleware(AdminMiddleware(admin_id, False))

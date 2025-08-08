@@ -18,7 +18,7 @@ class Client(Base):
     email: Mapped[str] = mapped_column(unique=True)
     history_access: Mapped[bool] = mapped_column(default=False)
     traffic_access: Mapped[bool] = mapped_column(default=False)
-    stats_access: Mapped[bool] = mapped_column(default=False)
+    requests_access: Mapped[bool] = mapped_column(default=False)
 
     traffic: Mapped[List["ClientTraffic"]] = relationship(back_populates = "client")
     history: Mapped[List["ClientHistory"]] = relationship(back_populates = "client")
@@ -27,7 +27,7 @@ class Client(Base):
 
     def __repr__(self):
         return f"Client(id={self.id}, email='{self.email}', history_access={self.history_access}, " \
-               f"traffic_access={self.traffic_access}, stats_access={self.stats_access})"
+               f"traffic_access={self.traffic_access}, requests_access={self.requests_access})"
 
 
 class ClientTraffic(Base):

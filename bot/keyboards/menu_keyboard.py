@@ -2,20 +2,20 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
-def create_main_menu(is_admin: bool = False, history_access: bool = False,
-                     traffic_access: bool = False, stats_access: bool = False) -> ReplyKeyboardMarkup:
+def create_main_menu(is_admin: bool = False, traffic_access: bool = False,
+                     history_access: bool = False, stats_access: bool = False) -> ReplyKeyboardMarkup:
     """Create the main menu keyboard."""
     builder = ReplyKeyboardBuilder()
     if is_admin:
         builder.row(KeyboardButton(text = "Status 🛠"), KeyboardButton(text = "All Stats 📊"))
     row_buttons = []
-    if history_access:
-        row_buttons.append(KeyboardButton(text = "History 📜"))
     if traffic_access:
         row_buttons.append(KeyboardButton(text = "Traffic 📈"))
+    if history_access:
+        row_buttons.append(KeyboardButton(text = "History 📜"))
     builder.row(*row_buttons)
     if stats_access:
-        builder.row(KeyboardButton(text = "Requests's statistics 📈"))
+        builder.row(KeyboardButton(text = "Requests's count 📈"))
     builder.row(KeyboardButton(text = "Settings ⚙️"), KeyboardButton(text = "Help ❓"))
     return builder.as_markup(resize_keyboard=True, one_time_keyboard=False)
 
