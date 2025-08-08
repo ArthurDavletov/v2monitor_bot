@@ -4,9 +4,9 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.utils.formatting import Text, Pre
 from dotenv import load_dotenv
+
 from bot.modules.logger import get_logger
 from bot.modules.v2ray import is_service_active, get_stats
-
 
 logger = get_logger(__name__)
 

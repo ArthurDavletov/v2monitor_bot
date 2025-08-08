@@ -2,23 +2,22 @@
 import asyncio
 import os
 
-from aiogram.fsm.storage.memory import MemoryStorage
-from dotenv import load_dotenv
-
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from bot.handlers import clients_manager
-from bot.middlewares.only_clients_middleware import OnlyClientsMiddleware
-from bot.modules.models import Base
-from bot.modules.logger import get_logger
-from bot.middlewares.is_admin_middleware import AdminMiddleware
-from bot.middlewares.db_middleware import DBSessionMiddleware
-import bot.handlers.common_commands as common_commands
 import bot.handlers.admin_commands as admin_commands
-
+import bot.handlers.common_commands as common_commands
+import bot.handlers.policies_commands as policies_commands
+from bot.handlers import clients_manager, clients_commands
+from bot.middlewares.db_middleware import DBSessionMiddleware
+from bot.middlewares.is_admin_middleware import AdminMiddleware
+from bot.middlewares.only_clients_middleware import OnlyClientsMiddleware
+from bot.modules.logger import get_logger
+from bot.modules.models import Base
 
 logger = get_logger(__name__)
 

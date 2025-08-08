@@ -1,10 +1,9 @@
-import subprocess
 import json
+import subprocess
 
 from prettytable import PrettyTable
 
 from .logger import get_logger
-
 
 logger = get_logger(__name__)
 

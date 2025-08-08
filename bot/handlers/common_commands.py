@@ -3,11 +3,12 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.formatting import Text, Bold
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from bot.handlers.policies_commands import get_policies
+from bot.keyboards.menu_keyboard import create_main_menu, settings_menu
 from bot.modules.logger import get_logger
 from bot.modules.models import Client
-from bot.keyboards.menu_keyboard import create_main_menu, settings_menu
 
 logger = get_logger(__name__)
 

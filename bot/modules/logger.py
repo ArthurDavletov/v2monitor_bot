@@ -6,9 +6,9 @@ compresses old log files into tar.gz archives.
 import logging
 import os
 import tarfile
-from pathlib import Path
-from logging.handlers import RotatingFileHandler
 import time
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 
 class CustomFormatter(logging.Formatter):
