@@ -63,6 +63,8 @@ async def cancel_handler(callback_query: CallbackQuery, state: FSMContext) -> No
 
 @router.callback_query(F.data == "add_client")
 async def add_client_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    logger.info(f"Received `Add Client` command from {callback_query.from_user.full_name} "
+                f"(ID: {callback_query.from_user.id})")
     await callback_query.answer()
     content = Text("Enter email (ID in v2ray) and Telegram ID of the new client.\n",
                    "Example: ", Pre("Friend 1234567890"), "\n",
@@ -73,6 +75,7 @@ async def add_client_handler(callback_query: CallbackQuery, state: FSMContext) -
 
 @router.message(ClientsManager.add_client)
 async def final_add_client_handler(message: Message, state: FSMContext) -> None:
+    logger.info(f"Admin {message.from_user.full_name} (ID: {message.from_user.id}) wants to add new clients")
     text = message.text
     new_clients = {}
     for line in text.splitlines():
@@ -96,6 +99,8 @@ async def final_add_client_handler(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data == "confirm_add_clients")
 async def confirm_add_clients_handler(callback_query: CallbackQuery, state: FSMContext,
                                       session: AsyncSession) -> None:
+    logger.info(f"Received `Confirm Add Clients` command from {callback_query.from_user.full_name} "
+                f"(ID: {callback_query.from_user.id})")
     clients = await state.get_data()
     for email, user_id in clients.items():
         session.add(Client(
@@ -116,6 +121,8 @@ async def confirm_add_clients_handler(callback_query: CallbackQuery, state: FSMC
 
 @router.callback_query(F.data == "remove_client")
 async def remove_client_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    logger.info(f"Received `Remove Client` command from {callback_query.from_user.full_name} "
+                f"(ID: {callback_query.from_user.id})")
     await callback_query.answer()
     content = Text("Enter indexes of users, which do you want to remove\n",
                    "Example: ", Code("1"), " or ", Code("2-3"), " or ",
@@ -128,6 +135,8 @@ async def remove_client_handler(callback_query: CallbackQuery, state: FSMContext
 @router.message(ClientsManager.remove_client)
 async def final_remove_client_handler(message: Message, state: FSMContext,
                                       session: AsyncSession) -> None:
+    logger.info(f"Received `Final Remove Clients` command from {message.from_user.full_name} "
+                f"(ID: {message.from_user.id})")
     indexes = set()
     text = message.text
     for number_match in re.split(r",\s*", text):
@@ -161,6 +170,8 @@ async def final_remove_client_handler(message: Message, state: FSMContext,
 @router.callback_query(F.data == "confirm_remove_clients")
 async def confirm_remove_clients_handler(callback_query: CallbackQuery, state: FSMContext,
                                          session: AsyncSession) -> None:
+    logger.info(f"Admin {callback_query.from_user.full_name} (ID: {callback_query.from_user.id}) "
+                f"deleted clients")
     user_ids = (await state.get_data())["remove_clients"]
     await session.execute(delete(Client).where(Client.id.in_(user_ids)))
     await session.execute(delete(ClientHistory).where(ClientHistory.user_id.in_(user_ids)))

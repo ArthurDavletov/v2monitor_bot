@@ -27,6 +27,8 @@ router = Router()
 @router.message(F.text == "Change Policy 📜")
 async def change_policy_handler(message: Message, session: AsyncSession,
                                 state: FSMContext) -> None:
+    logger.info(f"Received `Change Policy` command from {message.from_user.full_name} "
+                f"ID: {message.from_user.id}")
     content = Text("This bot provides several useful features:\n")
     content += Text("1. ") + Underline("Traffic") + Text(" usage analysis.\n")
     content += (Text("2. Tracking of ") + Underline("visited domains") +
@@ -50,6 +52,8 @@ async def change_policy_handler(message: Message, session: AsyncSession,
 async def policy_callback_handler(callback_query: CallbackQuery,
                                   callback_data: PolicyAccess,
                                   state: FSMContext, session: AsyncSession) -> None:
+    logger.info(f"Received `Change Policy` callback from {callback_query.from_user.full_name} "
+                f"ID: {callback_query.from_user.id}")
     user_id = callback_query.from_user.id
     policies = list((await state.get_data()).get("policies", await get_policies(user_id=user_id, session=session)))
     match callback_data.element:
@@ -66,6 +70,8 @@ async def policy_callback_handler(callback_query: CallbackQuery,
 
 @router.callback_query(F.data == "confirm_policy")
 async def confirm_policy_handler(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession) -> None:
+    logger.info(f"Received `Confirm Policy` callback from {callback_query.from_user.full_name} "
+                f"ID: {callback_query.from_user.id}")
     user_id = callback_query.from_user.id
     user_policies = await get_policies(user_id=user_id, session=session)
     new_policies = (await state.get_data()).get("policies", user_policies)

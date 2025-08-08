@@ -19,7 +19,7 @@ API_SERVER = os.getenv("API_SERVER")
 @router.message(F.text == "Status 🛠")
 async def command_status_handler(message: Message) -> None:
     """This handler receives messages with `Status 🛠` command"""
-    logger.info(f"Received `Status 🛠` command from {message.from_user.full_name}"
+    logger.info(f"Received `Status 🛠` command from {message.from_user.full_name} "
                 f"(ID: {message.from_user.id})")
     text = ""
     for service in ("v2ray", "nginx"):
@@ -33,7 +33,7 @@ async def command_status_handler(message: Message) -> None:
 @router.message(F.text == "All Stats 📊")
 async def command_stats_handler(message: Message) -> None:
     """This handler receives messages with `All Stats 📊` command"""
-    logger.info(f"Received `All Stats 📊` command from {message.from_user.full_name}"
+    logger.info(f"Received `All Stats 📊` command from {message.from_user.full_name} "
                 f"(ID: {message.from_user.id})")
     text = get_stats(API_SERVER)
     content = Text(Pre(text))
