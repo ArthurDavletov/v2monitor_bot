@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import List
 
 from sqlalchemy import ForeignKey
@@ -16,8 +16,8 @@ class Client(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
-    history_access: Mapped[bool] = mapped_column(default=False)
     traffic_access: Mapped[bool] = mapped_column(default=False)
+    history_access: Mapped[bool] = mapped_column(default=False)
     requests_access: Mapped[bool] = mapped_column(default=False)
 
     traffic: Mapped[List["ClientTraffic"]] = relationship(back_populates = "client")
@@ -35,8 +35,8 @@ class ClientTraffic(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
-    start_time: Mapped[datetime]
-    end_time: Mapped[datetime]
+    start_time: Mapped[datetime | None]
+    end_time: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))
     bytes_sent: Mapped[int] = mapped_column(default=0)
     bytes_received: Mapped[int] = mapped_column(default=0)
 
@@ -88,3 +88,14 @@ class ClientsTempSelection(Base):
     number: Mapped[int]
 
     client: Mapped[Client] = relationship(back_populates = "client_temp_selection")
+
+
+class ClientsTable(Base):
+    __tablename__ = "clients_table"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    direction: Mapped[str]
+    target: Mapped[str]
+    type: Mapped[str]
+    value: Mapped[int]
+    last_updated: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))

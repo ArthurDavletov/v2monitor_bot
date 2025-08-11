@@ -3,3 +3,4 @@ python-dotenv
 prettytable
 sqlalchemy[asyncio]
 aiosqlite
+apscheduler

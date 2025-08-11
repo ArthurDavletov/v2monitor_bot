@@ -18,6 +18,7 @@ from bot.middlewares.is_admin_middleware import AdminMiddleware
 from bot.middlewares.only_clients_middleware import OnlyClientsMiddleware
 from bot.modules.logger import get_logger
 from bot.modules.models import Base
+from bot.modules.stat_extractor import setup_scheduler
 
 logger = get_logger(__name__)
 
@@ -56,10 +57,10 @@ async def main() -> None:
     engine = create_async_engine(database_url)
     async with engine.connect() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
 
     dp = Dispatcher(storage = MemoryStorage())
-    dp.update.outer_middleware(DBSessionMiddleware(async_session))
+    dp.update.outer_middleware(DBSessionMiddleware(sessionmaker))
     dp.update.outer_middleware(OnlyClientsMiddleware(admin_id))
     dp.include_router(common_commands.router)
     dp.include_router(admin_commands.router)
@@ -69,6 +70,10 @@ async def main() -> None:
     common_commands.router.message.outer_middleware(AdminMiddleware(admin_id, True))
     admin_commands.router.message.outer_middleware(AdminMiddleware(admin_id, False))
     clients_manager.router.message.outer_middleware(AdminMiddleware(admin_id, False))
+
+    if api_server:
+        setup_scheduler(sessionmaker, api_server)
+
     await dp.start_polling(bot)
     await engine.dispose()
 
