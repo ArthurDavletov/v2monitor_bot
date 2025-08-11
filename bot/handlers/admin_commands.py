@@ -6,7 +6,7 @@ from aiogram.utils.formatting import Text, Pre
 from dotenv import load_dotenv
 
 from bot.modules.logger import get_logger
-from bot.modules.v2ray import is_service_active, get_stats
+from bot.modules.v2ray import is_service_active, get_stats, NoStatsAvailable, get_table
 
 logger = get_logger(__name__)
 
@@ -35,7 +35,9 @@ async def command_stats_handler(message: Message) -> None:
     """This handler receives messages with `All Stats 📊` command"""
     logger.info(f"Received `All Stats 📊` command from {message.from_user.full_name} "
                 f"(ID: {message.from_user.id})")
-    text = get_stats(API_SERVER)
+    try:
+        text = str(get_table(API_SERVER))
+    except NoStatsAvailable as e:
+        text = f"Error retrieving stats: {e.args[0]}"
     content = Text(Pre(text))
     await message.answer(**content.as_kwargs())
-
