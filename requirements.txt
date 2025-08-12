@@ -4,3 +4,4 @@ prettytable
 sqlalchemy[asyncio]
 aiosqlite
 apscheduler
+matplotlib

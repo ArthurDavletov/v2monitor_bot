@@ -35,7 +35,7 @@ class ClientTraffic(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
-    start_time: Mapped[datetime | None]
+    start_time: Mapped[datetime]
     end_time: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))
     bytes_sent: Mapped[int] = mapped_column(default=0)
     bytes_received: Mapped[int] = mapped_column(default=0)
