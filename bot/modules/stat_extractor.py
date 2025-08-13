@@ -30,7 +30,7 @@ async def get_clients(stats: list[dict[str, str | int]],
         client = await session.scalar(select(Client).where(Client.email == name))
         if client is None:
             continue
-        if name not in clients:
+        if client not in clients:
             clients[client] = {}
         if item["type"] == "uplink" and "uplink" not in clients[client]:
             clients[client]["uplink"] = item["value"]
