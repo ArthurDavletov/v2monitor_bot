@@ -32,9 +32,9 @@ async def get_clients(stats: list[dict[str, str | int]],
             continue
         if name not in clients:
             clients[client] = {}
-        if "uplink" in item and "uplink" not in clients[client]:
+        if item["type"] == "uplink" and "uplink" not in clients[client]:
             clients[client]["uplink"] = item["value"]
-        if "downlink" in item and "downlink" not in clients[client]:
+        if item["type"] == "downlink" and "downlink" not in clients[client]:
             clients[client]["downlink"] = item["value"]
     return clients
 
