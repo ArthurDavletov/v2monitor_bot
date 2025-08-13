@@ -10,6 +10,16 @@ from bot.modules.v2ray import get_stats, NoStatsAvailable
 
 async def get_clients(stats: list[dict[str, str | int]],
                       session: AsyncSession) -> dict[Client, dict[str, str | int]]:
+    """Convert v2ray stats into dict of Clients and information dicts
+
+    If client isn't registered in the bot, he won't be in dict
+    Information dict contains two keys: "uplink" and "downlink" (in bytes)
+
+    :param stats: List of v2ray stats dicts
+    :param session: SQLAlchemy async session
+
+    :return: Dict of Clients
+    """
     clients = {}
     for item in stats:
         name = item["target"]
@@ -18,14 +28,20 @@ async def get_clients(stats: list[dict[str, str | int]],
             continue
         if name not in clients:
             clients[client] = {}
-        if "uplink" in item:
-            clients[client].setdefault("uplink", item["uplink"])
-        if "downlink" in item:
-            clients[client].setdefault("downlink", item["downlink"])
+        if "uplink" in item and "uplink" not in clients[client]:
+            clients[client]["uplink"] = item["uplink"]
+        if "downlink" in item and "downlink" not in clients[client]:
+            clients[client]["downlink"] = item["downlink"]
     return clients
 
 
 async def save_stats(stats: list[dict[str, str | int]], current_time: datetime, session: AsyncSession) -> None:
+    """Save v2ray stats into the database.
+
+    :param stats: List of v2ray stats dicts
+    :param current_time: The time, when the stats were obtained.
+    :param session: SQLAlchemy async session
+    """
     for item in stats:
         direction, target, type_, value = item["direction"], item["target"], item["type"], item["value"]
         stmt = (
@@ -52,6 +68,12 @@ async def save_stats(stats: list[dict[str, str | int]], current_time: datetime, 
 async def update_traffic_info(clients: dict[Client, dict[str, str | int]],
                               current_time: datetime,
                               session: AsyncSession) -> None:
+    """Update the traffic info table.
+
+    :param clients: Dict of Clients and info dicts
+    :param current_time: The time, when the stats were obtained.
+    :param session: SQLAlchemy async session
+    """
     for client, info in clients.items():
         if not client.traffic_access:
             continue
@@ -75,7 +97,12 @@ async def update_traffic_info(clients: dict[Client, dict[str, str | int]],
         await session.commit()
 
 
-async def extract_stats(sessionmaker: async_sessionmaker[AsyncSession], api_server: str):
+async def extract_stats(sessionmaker: async_sessionmaker[AsyncSession], api_server: str) -> None:
+    """Extract and save stats every X minutes.
+
+    :param sessionmaker: SQLAlchemy async session
+    :param api_server: V2Ray API server
+    """
     async with sessionmaker() as session:
         try:
             stats, time = get_stats(api_server), datetime.now(UTC)
@@ -87,6 +114,13 @@ async def extract_stats(sessionmaker: async_sessionmaker[AsyncSession], api_serv
 
 
 def setup_scheduler(sessionmaker: async_sessionmaker[AsyncSession], api_server: str) -> AsyncIOScheduler:
+    """Sets up the scheduler and return it.
+
+    :param sessionmaker: SQLAlchemy async session
+    :param api_server: V2Ray API server
+
+    :return: AsyncIOScheduler
+    """
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         extract_stats,

@@ -36,6 +36,13 @@ def is_service_active(service_name: str = "v2ray") -> bool:
 
 
 def get_table(server: str) -> PrettyTable:
+    """Get a pretty table with stats.
+    Types of the traffic were shorten (downlink -> down, uplink -> up).
+    Bytes were converted to kilobytes, megabytes, etc.
+
+    :param server: The v2ray API server
+
+    Raises `NoStatsAvailable` if no stats are available."""
     stats = get_stats(server)
     if not stats:
         raise NoStatsAvailable("Stats are empty")
@@ -57,7 +64,17 @@ def get_table(server: str) -> PrettyTable:
 
 
 def get_stats(server: str) -> list[dict[str, int | float]]:
-    """Get statistics of the v2ray service."""
+    """Get statistics of the v2ray service.
+
+    :param server: API server
+
+    :return: list of dicts from v2ray api service
+
+    * direction - direction of the traffic (group)
+    * target - target of the traffic (tag)
+    * type - type of the traffic ("uplink" or "downlink")
+    * value - bytes of the traffic
+    """
     result = subprocess.run(
         [
             "v2ray", "api", "stats",
@@ -68,13 +85,14 @@ def get_stats(server: str) -> list[dict[str, int | float]]:
         text=True
     )
     if result.returncode != 0:
-        logger.error(f"Error getting stats: {result.stderr.strip()}.")
+        logger.error(f"Error getting stats: {result.stderr.strip()}. Return code: {result.returncode}.")
         raise NoStatsAvailable("Error getting stats")
     # Parse the JSON output
     stats = []
     for line in json.loads(result.stdout.strip()).get("stat", {}):
         name = line.get("name", "")
         if not name:
+            logger.warning(f"There's no name of user: {line}")
             continue
         direction, target, _, t = name.split(">>>")
         stats.append({

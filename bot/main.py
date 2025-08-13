@@ -72,6 +72,7 @@ async def main() -> None:
     clients_manager.router.message.outer_middleware(AdminMiddleware(admin_id, False))
 
     if api_server:
+        logger.info(f"Scheduler was set.")
         setup_scheduler(sessionmaker, api_server)
 
     await dp.start_polling(bot)
