@@ -59,7 +59,7 @@ async def traffic_handler(message: Message, session: AsyncSession) -> None:
     if client is None:
         await message.answer("You're not a client.")
         return
-    if client.traffic_access:
+    if not client.traffic_access:
         await message.answer("You don't granted access to the traffic in /policy")
         return
     try:
