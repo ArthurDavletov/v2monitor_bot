@@ -6,6 +6,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from bot.modules.models import Client, ClientHistory, ClientTraffic, ClientsTable
 from bot.modules.v2ray import get_stats, NoStatsAvailable
+from bot.modules.logger import get_logger
+
+
+logger = get_logger(__name__)
 
 
 async def get_clients(stats: list[dict[str, str | int]],
@@ -29,9 +33,9 @@ async def get_clients(stats: list[dict[str, str | int]],
         if name not in clients:
             clients[client] = {}
         if "uplink" in item and "uplink" not in clients[client]:
-            clients[client]["uplink"] = item["uplink"]
+            clients[client]["uplink"] = item["value"]
         if "downlink" in item and "downlink" not in clients[client]:
-            clients[client]["downlink"] = item["downlink"]
+            clients[client]["downlink"] = item["value"]
     return clients
 
 

@@ -99,6 +99,6 @@ def get_stats(server: str) -> list[dict[str, int | float]]:
             "direction": direction.strip(),
             "target": target.strip(),
             "type": t.strip(),
-            "value": line.get("value", 0)
+            "value": int(line.get("value", 0))
         })
     return stats
